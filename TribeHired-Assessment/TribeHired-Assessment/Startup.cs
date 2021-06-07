@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TribeHired_Assessment.Repositories;
 
 namespace TribeHired_Assessment
 {
@@ -26,6 +27,8 @@ namespace TribeHired_Assessment
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddHttpClient();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
