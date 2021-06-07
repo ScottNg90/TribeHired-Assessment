@@ -1,3 +1,5 @@
+using Microsoft.AspNet.OData.Builder;
+using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,7 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TribeHired_Assessment.Models;
 using TribeHired_Assessment.Repositories;
+using Newtonsoft.Json;
 
 namespace TribeHired_Assessment
 {
@@ -29,6 +33,7 @@ namespace TribeHired_Assessment
             services.AddControllers();
             services.AddHttpClient();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddOData();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,9 +50,15 @@ namespace TribeHired_Assessment
 
             app.UseAuthorization();
 
+            var builder = new ODataConventionModelBuilder(app.ApplicationServices);
+            builder.EntitySet<Post>("Post");
+            builder.EntitySet<Comment>("Comment");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.EnableDependencyInjection();
+                endpoints.Select().Expand().Filter().OrderBy().MaxTop(100).Count();
+                endpoints.MapODataRoute("ODataRoute", "odata", builder.GetEdmModel());
             });
         }
     }

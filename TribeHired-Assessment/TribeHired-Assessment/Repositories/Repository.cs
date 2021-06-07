@@ -9,7 +9,7 @@ namespace TribeHired_Assessment.Repositories
 {
     public interface IRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAll();
+        Task<IQueryable<T>> GetAll();
         Task<T> Get(long id);
     }
     public class Repository<T> : IRepository<T> where T : class
@@ -20,11 +20,11 @@ namespace TribeHired_Assessment.Repositories
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IQueryable<T>> GetAll()
         {
             var response = await _httpClientFactory.CreateClient().GetAsync("https://jsonplaceholder.typicode.com/" + typeof(T).Name + "s");
             var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<T>>(content);
+            return JsonConvert.DeserializeObject<List<T>>(content).AsQueryable();
         }
 
         public async Task<T> Get(long id)
